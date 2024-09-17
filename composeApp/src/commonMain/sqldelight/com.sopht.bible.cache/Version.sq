@@ -1,0 +1,38 @@
+import kotlin.Boolean;
+
+CREATE TABLE version (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    acronym TEXT NOT NULL,
+    description TEXT,
+    language_id INTEGER NOT NULL,
+    is_downloaded INTEGER AS Boolean NOT NULL DEFAULT(0),
+    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000)
+);
+
+insertVersion:
+INSERT OR REPLACE INTO version (id, name, acronym, description, language_id)
+    VALUES (:id,:name,:acronym,:description,:languageId);
+
+lastInsertedVersionRowId:
+SELECT last_insert_rowid();
+
+getAllVersions:
+SELECT * FROM version;
+
+getVersionsByDownloadStatus:
+SELECT * FROM version
+    WHERE is_downloaded = :isDownloaded;
+
+updateDownloadStatus:
+UPDATE version
+    SET is_downloaded = :isDownloaded
+    WHERE id = ?;
+
+clearVersionTable:
+DELETE FROM version;
+
+deleteVersionTable {
+DROP TABLE IF EXISTS version;
+}

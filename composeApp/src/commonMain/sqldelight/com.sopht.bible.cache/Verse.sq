@@ -1,0 +1,89 @@
+import kotlin.String;
+import kotlin.collections.Map;
+import kotlin.ranges.IntRange;
+
+CREATE TABLE verse (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    book_id INTEGER NOT NULL,
+    chapter_number INTEGER NOT NULL,
+    verse_number INTEGER NOT NULL,
+    version_id INTEGER NOT NULL,
+    verse_text TEXT NOT NULL,
+    title TEXT,
+    bookmark_id INTEGER,
+    verse_references TEXT AS Map<IntRange, String>,
+    highlights TEXT AS Map<IntRange, String>,
+    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000)
+);
+
+insertVerse:
+INSERT OR REPLACE INTO verse (id, book_id, chapter_number, verse_number, version_id, verse_text, title, verse_references, highlights)
+    VALUES (:id, :bookId, :chapterNumber, :verseNumber, :versionId, :verseText, :title, :verseReferences, :highlights);
+
+lastInsertedVerseRowId:
+SELECT last_insert_rowid();
+
+updateHighlights:
+UPDATE verse
+    SET highlights = ?
+    WHERE id = ?;
+
+updateBookmark:
+UPDATE verse
+    SET bookmark_id = :bookmarkId
+    WHERE id = ?;
+
+getNextVerses:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+    WHERE v.version_id = :versionId AND v.id > :id
+    ORDER BY v.id ASC
+    LIMIT 20;
+
+getPreviousVerses:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+    WHERE v.version_id = :versionId AND v.id < :id
+    ORDER BY v.id ASC
+    LIMIT 20;
+
+getVersesToCompare:
+SELECT * FROM verse
+    WHERE version_id IN :versionIdsList;
+
+getVerseById:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+    WHERE v.id = :id;
+
+getLastViewedVerse:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+--     WHERE v.id = last_insert_row_id();
+    ORDER BY v.updated_at DESC
+    LIMIT 1;
+
+getRandomVerse:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+    ORDER BY random();
+
+getLastBookmarkedVerse:
+SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
+    INNER JOIN book AS b ON v.book_id = b.id
+    INNER JOIN version AS bv ON v.version_id = bv.id
+    INNER JOIN bookmark AS bm ON v.bookmark_id = bm.id
+    ORDER BY bm.updated_at DESC LIMIT 1;
+
+dropVerseTable {
+DROP TABLE IF EXISTS verse;
+}
+
+deleteAllVerses:
+DELETE FROM verse;

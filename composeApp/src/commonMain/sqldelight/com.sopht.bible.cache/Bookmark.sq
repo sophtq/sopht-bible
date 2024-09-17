@@ -1,0 +1,19 @@
+create:
+CREATE TABLE bookmark(
+    id INTEGER PRIMARY KEY,
+    highlighted INTEGER,
+    category_id INTEGER,
+    book INTEGER,
+    chapter INTEGER,
+    verse_start INTEGER,
+    verse_end INTEGER,
+    content TEXT,
+    bible TEXT,
+    bookmark_date TEXT,
+    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000)
+);
+
+drop{
+    DROP TABLE IF EXISTS bookmark;
+}

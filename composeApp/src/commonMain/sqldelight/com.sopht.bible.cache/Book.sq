@@ -1,0 +1,32 @@
+CREATE TABLE book (
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    abbreviation TEXT NOT NULL,
+    language_id INTEGER NOT NULL,
+    chapters_count INTEGER NOT NULL,
+    verses_count INTEGER NOT NULL,
+    testament TEXT NOT NULL,
+    division TEXT NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    PRIMARY KEY (id, language_id)
+);
+
+insertBook:
+INSERT OR REPLACE INTO book (id, name, abbreviation, language_id, chapters_count, verses_count, testament, division)
+    VALUES (:id, :name, :abbreviation, :languageId, :chaptersCount, :versesCount,:testament, :division);
+
+lastInsertedBookRowId:
+SELECT last_insert_rowid();
+
+getBooksNamesByLanguage:
+SELECT * FROM book
+    WHERE language_id = :languageId
+    ORDER BY id ASC;
+
+deleteAllBooks:
+DELETE FROM book;
+
+removeBookTable {
+DROP TABLE IF EXISTS book;
+}
