@@ -30,6 +30,10 @@ class ChapterRepository (private val httpClient: HttpClient, appDatabase: AppDat
 //        }
 //    }
 
+    fun getCount(): Long {
+        return chapterQueries.getCount().executeAsOne()
+    }
+
     fun getChaptersForBook(bookId: Long): List<Chapter> {
         return chapterQueries.getChaptersForBook(bookId).executeAsList().map {
             Chapter(

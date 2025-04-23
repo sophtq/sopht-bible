@@ -31,6 +31,10 @@ class LanguageRepository (private val httpClient: HttpClient, appDatabase: AppDa
 
     private val languageQueries = appDatabase.languageQueries
 
+    fun getCount(): Long {
+        return languageQueries.getCount().executeAsOne()
+    }
+
     fun getLanguages(bookId: Long): List<Language> {
         return languageQueries.getLanguages().executeAsList().map {
             Language(

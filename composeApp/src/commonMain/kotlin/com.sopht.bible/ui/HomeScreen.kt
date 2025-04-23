@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.sopht.bible.models.Verse
+import com.sopht.bible.utils.AppLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -54,10 +55,13 @@ fun HomeScreen(navController: NavController, vm: BibleViewModel, modifier: Modif
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             var message by remember { mutableStateOf("Sopht Bible") }
-            var shouldShowDialog by remember { mutableStateOf(true) }
-            var lastMeal by remember { mutableStateOf( Verse(1,20,"John",3,16,"NIV", 2, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
-            var randomVerse by remember { mutableStateOf( Verse(2,20,"John",3,16,"NIV", 3, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
-            var lastBookmark by remember { mutableStateOf( Verse(3,20,"John",3,16,"NIV", 4, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
+            var shouldShowDialog by remember { mutableStateOf(vm.shouldRefreshDB()) }
+//            var lastMeal by remember { mutableStateOf( Verse(1,20,"John",3,16,"NIV", 2, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
+//            var randomVerse by remember { mutableStateOf( Verse(2,20,"John",3,16,"NIV", 3, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
+//            var lastBookmark by remember { mutableStateOf( Verse(3,20,"John",3,16,"NIV", 4, "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."))}
+            var lastMeal by remember { mutableStateOf(vm.getLastMeal()) }
+            var randomVerse by remember { mutableStateOf(vm.getRandomVerse()) }
+            var lastBookmark by remember { mutableStateOf(vm.getLastBookmarkedVerse()) }
             val selectedText = remember{mutableStateOf("")}
             val scope = rememberCoroutineScope()
             var completeCount = 0
@@ -89,19 +93,21 @@ fun HomeScreen(navController: NavController, vm: BibleViewModel, modifier: Modif
                         )
                     }
                 }
-            }
-            message = "Initializing"
-            vm.initializeDatabase { count ->
-                completeCount += count
-                if (completeCount >= 4) {
-                    shouldShowDialog = false
-                    scope.launch {
-                        delay(2000)
+
+                message = "Initializing"
+                vm.initializeDatabase { count ->
+                    completeCount += count
+                    if (completeCount >= 4) {
+                        shouldShowDialog = false
+                        scope.launch {
+                            delay(2000)
 //                        randomVerse = vm.getRandomVerse()
 //                        lastMeal = vm.getLastMeal()
 //                        lastBookmark = vm.getLastBookmarkedVerse() ?: lastMeal
+                        }
                     }
                 }
+
             }
 
             Card(
@@ -124,7 +130,7 @@ fun HomeScreen(navController: NavController, vm: BibleViewModel, modifier: Modif
                     modifier = modifier
                 ) {
                     Text(
-                        text = "Last meal\n$lastMeal",
+                        text = "Last meal\n${lastMeal ?: "No verse"}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = modifier.padding(16.dp),
                         textAlign = TextAlign.Left
@@ -153,18 +159,18 @@ fun HomeScreen(navController: NavController, vm: BibleViewModel, modifier: Modif
                     .defaultMinSize(minHeight = 100.dp),
 //                onClick = { navController.navigate(Screens.Bible.route) }
             ) {
-                TextWithSelectedText(
-                    selectedText = selectedText
-                )
+//                TextWithSelectedText(
+//                    selectedText = selectedText
+//                )
                 Text(
-                    text = "Random Verse $selectedText",
+                    text = "Random Verse",
                     modifier = Modifier
                         .padding(16.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "$randomVerse",
+                    text = "${randomVerse ?: "No verse"}",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = modifier.padding(16.dp),
                     textAlign = TextAlign.Left
@@ -187,7 +193,7 @@ fun HomeScreen(navController: NavController, vm: BibleViewModel, modifier: Modif
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "$lastBookmark",
+                    text = "${lastBookmark ?: "No verse"}",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = modifier.padding(16.dp),
                     textAlign = TextAlign.Left
