@@ -13,8 +13,8 @@ CREATE TABLE verse (
     bookmark_id INTEGER,
     verse_references TEXT AS Map<IntRange, String>,
     highlights TEXT AS Map<IntRange, String>,
-    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
-    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000)
+    created_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000)),
+    updated_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000))
 );
 
 insertVerse:
@@ -23,6 +23,9 @@ INSERT OR REPLACE INTO verse (id, book_id, chapter_number, verse_number, version
 
 lastInsertedVerseRowId:
 SELECT last_insert_rowid();
+
+getCount:
+SELECT count(*) AS count FROM verse;
 
 updateHighlights:
 UPDATE verse
@@ -47,7 +50,7 @@ SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
     INNER JOIN book AS b ON v.book_id = b.id
     INNER JOIN version AS bv ON v.version_id = bv.id
     WHERE v.version_id = :versionId AND v.id < :id
-    ORDER BY v.id ASC
+    ORDER BY v.id DESC
     LIMIT 20;
 
 getVersesToCompare:
@@ -72,7 +75,8 @@ getRandomVerse:
 SELECT v.*, b.name, bv.acronym AS version FROM verse AS v
     INNER JOIN book AS b ON v.book_id = b.id
     INNER JOIN version AS bv ON v.version_id = bv.id
-    ORDER BY random();
+    ORDER BY random()
+    LIMIT 1;
 
 getLastBookmarkedVerse:
 SELECT v.*, b.name, bv.acronym AS version FROM verse AS v

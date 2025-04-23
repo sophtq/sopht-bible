@@ -81,6 +81,8 @@ kotlin {
             implementation (libs.primitive.adapters)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
+//            api(libs.androidx.datastore.preferences.core)
+//            api(libs.androidx.datastore.core.okio)
         }
 
         androidMain.dependencies {
@@ -89,6 +91,9 @@ kotlin {
             // Koin
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+
+            //Ktor
+            implementation(libs.ktor.client.okhttp)
 
             // Coroutines
             implementation(libs.kotlinx.coroutines.android)

@@ -2,8 +2,8 @@ package com.sopht.bible.models
 
 data class Verse(
     /*
-    * john 3:16
-    * 0101001
+    * John 3:16
+    * 1043003016
     *
     * */
     val id: Long,
@@ -20,6 +20,6 @@ data class Verse(
     val highlights: Map<IntRange, String> = emptyMap()
 ) {
     override fun toString(): String {
-        return "$bookName $bookId:$chapterNumber ($bibleVersion) - $text"
+        return "$bookName $chapterNumber:$verseNumber ($bibleVersion) - $text"
     }
 }

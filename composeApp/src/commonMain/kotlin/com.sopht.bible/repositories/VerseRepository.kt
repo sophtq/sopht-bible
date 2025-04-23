@@ -16,6 +16,10 @@ class VerseRepository (appDatabase: AppDatabase) {
         return verseIdStr.toLong();
     }
 
+    fun getCount(): Long {
+        return verseQueries.getCount().executeAsOne()
+    }
+
     fun insertVerse(verse: Verse) {
         verseQueries.insertVerse(
             id = verse.id,
@@ -49,7 +53,7 @@ class VerseRepository (appDatabase: AppDatabase) {
         }.executeAsOne()
     }
 
-    fun getLastReadVerse(): Verse {
+    fun getLastReadVerse(): Verse? {
         return verseQueries.getLastViewedVerse { verseId, bookId, chapterNumber, verseNumber, versionID, verseText, title, bookmarkId, verseReferences, highlights, _, _, bookName, version ->
             Verse(
                 id = verseId,
@@ -65,10 +69,10 @@ class VerseRepository (appDatabase: AppDatabase) {
                 references = verseReferences ?: emptyMap(),
                 highlights = highlights ?: emptyMap()
             )
-        }.executeAsOne()
+        }.executeAsOneOrNull()
     }
 
-    fun getRandomVerse(): Verse {
+    fun getRandomVerse(): Verse? {
         return verseQueries.getRandomVerse { verseId, bookId, chapterNumber, verseNumber, versionID, verseText, title, bookmarkId, verseReferences, highlights, _, _, bookName, version ->
             Verse(
                 id = verseId,
@@ -84,10 +88,10 @@ class VerseRepository (appDatabase: AppDatabase) {
                 references = verseReferences ?: emptyMap(),
                 highlights = highlights ?: emptyMap()
             )
-        }.executeAsOne()
+        }.executeAsOneOrNull()
     }
 
-    fun getLastBookmarkedVerse(): Verse {
+    fun getLastBookmarkedVerse(): Verse? {
         return verseQueries.getLastBookmarkedVerse { verseId, bookId, chapterNumber, verseNumber, versionID, verseText, title, bookmarkId, verseReferences, highlights, _, _, bookName, version ->
             Verse(
                 id = verseId,
@@ -103,7 +107,7 @@ class VerseRepository (appDatabase: AppDatabase) {
                 references = verseReferences ?: emptyMap(),
                 highlights = highlights ?: emptyMap()
             )
-        }.executeAsOne()
+        }.executeAsOneOrNull()
     }
 
     fun getNextVerses(lastVerseId: Long, versionId: Long): List<Verse> {
@@ -125,8 +129,8 @@ class VerseRepository (appDatabase: AppDatabase) {
         }.executeAsList()
     }
 
-    fun getEarlyVerses(earliestVerseId: Long, versionId: Long): List<Verse> {
-        return verseQueries.getPreviousVerses(versionId = versionId, id = earliestVerseId)
+    fun getPreviousVerses(firstVerseId: Long, versionId: Long): List<Verse> {
+        return verseQueries.getPreviousVerses(versionId = versionId, id = firstVerseId)
         { verseId, bookId, chapterNumber, verseNumber, versionID, verseText, title, bookmarkId, verseReferences, highlights, _, _, bookName, version ->
             Verse(
                 id = verseId,

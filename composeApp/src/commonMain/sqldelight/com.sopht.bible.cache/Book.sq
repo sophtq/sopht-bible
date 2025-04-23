@@ -7,8 +7,8 @@ CREATE TABLE book (
     verses_count INTEGER NOT NULL,
     testament TEXT NOT NULL,
     division TEXT NOT NULL,
-    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
-    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
+    created_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000)),
+    updated_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000)),
     PRIMARY KEY (id, language_id)
 );
 
@@ -18,6 +18,9 @@ INSERT OR REPLACE INTO book (id, name, abbreviation, language_id, chapters_count
 
 lastInsertedBookRowId:
 SELECT last_insert_rowid();
+
+getCount:
+SELECT count(*) AS count FROM book;
 
 getBooksNamesByLanguage:
 SELECT * FROM book

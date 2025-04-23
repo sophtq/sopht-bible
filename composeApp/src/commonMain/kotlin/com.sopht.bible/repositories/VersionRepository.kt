@@ -20,6 +20,10 @@ class VersionRepository(private val httpClient: HttpClient, appDatabase: AppData
 
     private val versionQueries = appDatabase.versionQueries
 
+    fun getCount(): Long {
+        return versionQueries.getCount().executeAsOne()
+    }
+
     fun getVersions(): List<Version> {
         return versionQueries.getAllVersions().executeAsList().map {
             Version(
@@ -31,6 +35,14 @@ class VersionRepository(private val httpClient: HttpClient, appDatabase: AppData
                 isDownloaded = it.is_downloaded
             )
         }
+    }
+
+    fun getVersion(id: Long): Version {
+        return versionQueries.getVersionById(id) {ID, name, acronym, description, language_id, is_downloaded, _, _ ->
+            Version(
+                ID, language_id, acronym, name, description, is_downloaded
+            )
+        }.executeAsOne()
     }
 
     fun getVersionsByDownloadStatus(isDownloaded: Boolean): List<Version> {
