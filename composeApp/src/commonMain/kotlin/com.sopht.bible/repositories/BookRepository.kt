@@ -16,6 +16,10 @@ import kotlinx.serialization.json.Json
 class BookRepository(private val httpClient: HttpClient, appDatabase: AppDatabase) {
     private val bookQueries = appDatabase.bookQueries
 
+    fun getCount(): Long {
+        return bookQueries.getCount().executeAsOne()
+    }
+
     fun getBooksByLanguage(languageId: Long): List<Book> {
         return bookQueries.getBooksNamesByLanguage(languageId).executeAsList().map {
             Book(

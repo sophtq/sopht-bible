@@ -40,12 +40,13 @@ fun VersionsScreen(viewModel: BibleViewModel) {
     var shouldShowOnboarding by remember { mutableStateOf(true) }
     var numberOfBibles by remember { mutableStateOf(0) }
     var downloadMessage by remember { mutableStateOf("KJV") }
-    var versions by remember { mutableStateOf(emptyList<Version>()) }
+    var versions = viewModel.getVersions()
     val scope = rememberCoroutineScope()
 
-    scope.launch { versions = viewModel.getVersions() }
+//    scope.launch { versions = viewModel.getVersions() }
+//    print(versions[0])
     LazyColumn(modifier = Modifier.fillMaxWidth().height(100.dp), contentPadding = PaddingValues(16.dp)) {
-        items(versions) { version ->
+        items(versions, key = { it.id }) { version ->
             var downloadProgress: Float? by mutableStateOf(null)
             ColumnItem(viewModel, version)
         }
@@ -101,7 +102,6 @@ fun ColumnItem(
                             }, onComplete = {
                                 downloadProgress = null
                                 version.isDownloaded = true
-//                                println("Complete")
                             })
                         }
                     ) {
@@ -111,7 +111,6 @@ fun ColumnItem(
                         )
                     }
                 }
-//                println(downloadProgress)
                 downloadProgress?.let {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
@@ -124,49 +123,3 @@ fun ColumnItem(
         }
     }
 }
-
-
-//Column {
-//    Text("Hello")
-//    Text(downloadMessage)
-//    FloatingActionButton(
-//        onClick = {
-//            scope.launch {
-//                downloadMessage = "Downloading..."
-//                kotlin.runCatching {
-//                    sdk.getVersionsList(false)
-//                }.onSuccess {
-//                    numberOfBibles = it.size
-//                    downloadMessage = "$numberOfBibles bibles downloaded and saved"
-//                    //                            Toast.makeText(this@MainActivity, "${it.size} Bibles Fetched", Toast.LENGTH_LONG).show()
-//                    //                            Log.d("TESTING-SUCCESS", "${it.size} Bibles Fetched")
-//                }.onFailure {
-//                    downloadMessage = "An error occurred ${it.message ?: "NuLL"}"
-//                    //                            Toast.makeText(this@MainActivity, it.localizedMessage, Toast.LENGTH_SHORT).show()
-//                    //                            it.localizedMessage?.let { it1 -> Log.d("TESTING-FAIL", it1) }
-//                }
-//            }
-//            scope.launch {
-//                downloadMessage = "Downloading Bibles..."
-//                kotlin.runCatching {
-//                    viewModel.downloadVersion(Version(1, 1, "KJV", "King James Version", description = ""),
-//                        downloadProgress = {message ->
-//                            println(message)
-//                            downloadMessage = message
-//                        },
-//                        onComplete = {
-//                            downloadMessage = "All complete"
-//                        })
-//                }.onSuccess {
-//                    downloadMessage = "Success"
-//                }.onFailure {
-//                    downloadMessage = "An error occurred ${it.message ?: "NuLL"}"
-//                    //                            Toast.makeText(this@MainActivity, it.localizedMessage, Toast.LENGTH_SHORT).show()
-//                    //                            it.localizedMessage?.let { it1 -> Log.d("TESTING-FAIL", it1) }
-//                }
-//            }
-//
-//        },
-//        content = {Text("Click")}
-//    )
-//}

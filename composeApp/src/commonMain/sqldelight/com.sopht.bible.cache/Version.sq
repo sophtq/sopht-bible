@@ -7,8 +7,8 @@ CREATE TABLE version (
     description TEXT,
     language_id INTEGER NOT NULL,
     is_downloaded INTEGER AS Boolean NOT NULL DEFAULT(0),
-    created_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000),
-    updated_at INTEGER NOT NULL DEFAULT(unixepoch('subsec')*1000)
+    created_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000)),
+    updated_at INTEGER NOT NULL DEFAULT(1000*(strftime('%s', 'now') + strftime('%f', 'now') / 1000))
 );
 
 insertVersion:
@@ -18,8 +18,15 @@ INSERT OR REPLACE INTO version (id, name, acronym, description, language_id)
 lastInsertedVersionRowId:
 SELECT last_insert_rowid();
 
+getCount:
+SELECT count(*) AS count FROM version;
+
 getAllVersions:
 SELECT * FROM version;
+
+getVersionById:
+SELECT * FROM version
+    WHERE id = :id;
 
 getVersionsByDownloadStatus:
 SELECT * FROM version
